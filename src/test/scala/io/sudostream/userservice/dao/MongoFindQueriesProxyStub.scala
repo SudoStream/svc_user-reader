@@ -11,6 +11,12 @@ class MongoFindQueriesProxyStub extends MongoFindQueriesProxy {
   def findAllUsers: Future[Seq[Document]] = {
     val userAndy = Document(
       "_id" -> "someId123",
+      "socialNetworkIds" -> BsonArray(
+        Document(
+          "socialNetwork" -> "GOOGLE",
+          "id" -> "12345"
+        )
+      ),
       "fullName" -> "Andy Boyle",
       "givenName" -> "Andy",
       "familyName" -> "Boyle",
@@ -28,6 +34,12 @@ class MongoFindQueriesProxyStub extends MongoFindQueriesProxy {
 
     val userYvonne = Document(
       "_id" -> "someId124",
+      "socialNetworkIds" -> BsonArray(
+        Document(
+          "socialNetwork" -> "GOOGLE",
+          "id" -> "121212"
+        )
+      ),
       "fullName" -> "Yvonne Boyle",
       "givenName" -> "Yvonne",
       "familyName" -> "Boyle",

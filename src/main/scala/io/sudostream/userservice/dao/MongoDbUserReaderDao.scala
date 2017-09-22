@@ -28,6 +28,7 @@ sealed class MongoDbUserReaderDao(mongoFindQueriesProxy: MongoFindQueriesProxy,
     Try {
 
       val theTimeToTeachId: String = singleUserDoc.getString("_id")
+      val theSocialNetworkIds: List[SocialNetworkIdWrapper] = extractSocialNetworkIds(singleUserDoc.get[BsonArray]("socialNetworkIds"))
       val theFullName: String = singleUserDoc.getString("fullName")
       val theGivenName: Option[String] = singleUserDoc.getString("givenName") match {
         case str: String => if (str == null || str.isEmpty) Option.empty else Some(str)
@@ -53,6 +54,7 @@ sealed class MongoDbUserReaderDao(mongoFindQueriesProxy: MongoFindQueriesProxy,
 
       User(
         timeToTeachId = theTimeToTeachId,
+        socialNetworkIds = theSocialNetworkIds,
         fullName = theFullName,
         givenName = theGivenName,
         familyName = theFamilyName,
@@ -86,6 +88,44 @@ sealed class MongoDbUserReaderDao(mongoFindQueriesProxy: MongoFindQueriesProxy,
           seqOfUsers map { userTry => userTry.get }
         }
     }
+  }
+
+  private[dao] def extractSocialNetworkIds(maybeSocialNetworkIds: Option[BsonArray]): List[SocialNetworkIdWrapper] = {
+    maybeSocialNetworkIds match {
+      case Some(socialNetworkIdsAsBsonArray) =>
+        val socialNetworkIdsAsBsonList: util.List[BsonValue] = socialNetworkIdsAsBsonArray.getValues
+
+        val socialNetworkIdsDetailTupleSeq: Seq[(String, String)] = for {
+          socialIdElem: BsonValue <- socialNetworkIdsAsBsonList
+          socialIdDoc = socialIdElem.asDocument()
+
+          socialNetworkName: BsonString = socialIdDoc.getString("socialNetwork")
+          socialNetworkUserId: BsonString = socialIdDoc.getString("id")
+        } yield (socialNetworkName.getValue, socialNetworkUserId.getValue)
+
+        {
+          socialNetworkIdsDetailTupleSeq map {
+            socialNetworkIdTuple =>
+
+              val socialNetworkName = socialNetworkIdTuple._1 match {
+                case "FACEBOOK" => SocialNetwork.FACEBOOK
+                case "GOOGLE" => SocialNetwork.GOOGLE
+                case "TWITTER" => SocialNetwork.TWITTER
+                case _ => SocialNetwork.OTHER
+              }
+
+              SocialNetworkIdWrapper(
+                socialNetworkId = SocialNetworkId(
+                  socialNetwork = socialNetworkName,
+                  id = socialNetworkIdTuple._2
+                )
+              )
+          }
+        }.toList
+
+      case None => throwRuntimeError("socialNetworkIds")
+    }
+
   }
 
   private[dao] def extractEmailDetails(emailsAsBsonArrayOption: Option[BsonArray]): List[EmailDetails] = {
