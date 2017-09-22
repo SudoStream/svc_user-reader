@@ -5,7 +5,7 @@ import java.util.UUID
 
 import akka.actor.ActorSystem
 import akka.http.scaladsl.model.{ContentTypes, HttpEntity}
-import akka.http.scaladsl.server.Directives.{complete, failWith, get, onComplete, path}
+import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import akka.kafka.scaladsl.Producer
 import akka.stream.Materializer
@@ -15,11 +15,12 @@ import io.sudostream.timetoteach.messages.events.SystemEvent
 import io.sudostream.timetoteach.messages.systemwide.{SystemEventType, TimeToTeachApplication}
 import io.sudostream.userservice.api.kafka.StreamingComponents
 import io.sudostream.userservice.config.ActorSystemWrapper
+import io.sudostream.userservice.dao.UserReaderDao
 import org.apache.kafka.clients.producer.ProducerRecord
 
 import scala.concurrent.ExecutionContextExecutor
-import scala.util.{Failure, Success}
 import scala.concurrent.duration._
+import scala.util.{Failure, Success}
 
 class HttpRoutes(dao: UserReaderDao,
                  actorSystemWrapper: ActorSystemWrapper,
@@ -33,17 +34,17 @@ class HttpRoutes(dao: UserReaderDao,
 
   implicit val timeout = Timeout(30 seconds)
 
-  val routes: Route = path("api" / "esandos") {
+  val routes: Route = path("api" / "users") {
     get {
       val initialRequestReceived = Instant.now().toEpochMilli
-      log.debug("Called 'api/esandos' and now getting All the E's and O's from the DAO")
+      log.debug("Called 'api/users' and now getting All the E's and O's from the DAO")
 
-      val scottishEsAndOsDataFuture = dao.extractAllScottishEsAndOs
+      val usersFuture = dao.extractAllUsers
 
-      Source.fromFuture(scottishEsAndOsDataFuture)
+      Source.fromFuture(usersFuture)
         .map {
           elem =>
-            log.info(s"Received all ${elem.allExperiencesAndOutcomes.size} E's and O's from the DAO")
+            log.info(s"Received all ${elem.size} users from the DAO")
 
             SystemEvent(
               eventType = SystemEventType.SCOTTISH_ES_AND_OS_REQUESTED_EVENT,
@@ -60,11 +61,11 @@ class HttpRoutes(dao: UserReaderDao,
           elem =>
             new ProducerRecord[Array[Byte], SystemEvent](streamingComponents.definedSystemEventsTopic, elem)
         }
-        .runWith(Producer.plainSink(streamingComponents.systemEventProducerSettings))
+        .runWith(Producer.plainSink(streamingComponents.producerSettings))
 
-      onComplete(scottishEsAndOsDataFuture) {
-        case Success(esAndOsData) =>
-          complete(HttpEntity(ContentTypes.`application/json`, esAndOsData.toString))
+      onComplete(usersFuture) {
+        case Success(users) =>
+          complete(HttpEntity(ContentTypes.`application/json`, users.toString))
         case Failure(ex) => failWith(ex)
       }
 

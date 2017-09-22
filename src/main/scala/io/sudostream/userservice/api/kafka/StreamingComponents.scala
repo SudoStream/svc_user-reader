@@ -3,7 +3,7 @@ package io.sudostream.userservice.api.kafka
 import akka.actor.ActorSystem
 import akka.kafka.ProducerSettings
 import akka.stream.Materializer
-import io.sudostream.timetoteach.kafka.serializing.ScottishEsAndOsDataSerializer
+import io.sudostream.timetoteach.kafka.serializing.SystemEventSerializer
 import io.sudostream.userservice.config.{ActorSystemWrapper, ConfigHelper}
 import org.apache.kafka.common.serialization.ByteArraySerializer
 
@@ -17,11 +17,11 @@ class StreamingComponents(configHelper: ConfigHelper, actorSystemWrapper: ActorS
 
   lazy val kafkaProducerBootServers = configHelper.config.getString("akka.kafka.producer.bootstrapservers")
 
-  val producerSettings = ProducerSettings(system, new ByteArraySerializer, new ScottishEsAndOsDataSerializer)
+  val producerSettings = ProducerSettings(system, new ByteArraySerializer, new SystemEventSerializer)
     .withBootstrapServers(kafkaProducerBootServers)
 
   def definedSystemEventsTopic: String = {
-    val sink_topic = configHelper.config.getString("esandos.system_events_topic")
+    val sink_topic = configHelper.config.getString("user-service.system_events_topic")
     log.info(s"Sink topic is '$sink_topic'")
     sink_topic
   }
