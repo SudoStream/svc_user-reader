@@ -4,6 +4,7 @@ import java.time.Instant
 import java.util.UUID
 
 import akka.actor.ActorSystem
+import akka.event.LoggingAdapter
 import akka.http.scaladsl.model.{ContentTypes, HttpEntity}
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
@@ -30,11 +31,12 @@ class HttpRoutes(dao: UserReaderDao,
   implicit val system: ActorSystem = actorSystemWrapper.system
   implicit val executor: ExecutionContextExecutor = system.dispatcher
   implicit val materializer: Materializer = actorSystemWrapper.materializer
-  val log = system.log
+  val log: LoggingAdapter = system.log
 
-  implicit val timeout = Timeout(30 seconds)
+  implicit val timeout: Timeout = Timeout(30 seconds)
 
-  val routes: Route = path("api" / "users") {
+  val routes: Route = path("api" / "users" ) {
+
     get {
       val initialRequestReceived = Instant.now().toEpochMilli
       log.debug("Called 'api/users' and now getting All the E's and O's from the DAO")
@@ -70,6 +72,11 @@ class HttpRoutes(dao: UserReaderDao,
       }
 
     }
+    path(RemainingPath) { remaining =>
+      println(s".... remaining ... ${remaining.toString()}")
+      failWith(new RuntimeException)
+    }
+
   } ~ health
 
 
