@@ -6,7 +6,7 @@ enablePlugins(JavaAppPackaging)
 enablePlugins(UniversalPlugin)
 enablePlugins(DockerPlugin)
 
-name := "user-service"
+name := "user-reader"
 organization := "io.sudostream"
 scalaVersion := "2.11.8"
 version := "0.0.1-1"
@@ -15,7 +15,7 @@ version := "0.0.1-1"
 dockerBaseImage := "anapsix/alpine-java:8_server-jre"
 dockerRepository := Some("eu.gcr.io/time-to-teach")
 dockerUpdateLatest := true
-packageName in Docker := "user-service"
+packageName in Docker := "user-reader"
 
 dockerCommands ++= Seq(
   // setting the run script executable

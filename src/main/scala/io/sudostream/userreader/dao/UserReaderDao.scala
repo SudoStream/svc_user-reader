@@ -1,4 +1,4 @@
-package io.sudostream.userservice.dao
+package io.sudostream.userreader.dao
 
 import io.sudostream.timetoteach.messages.systemwide.model.User
 

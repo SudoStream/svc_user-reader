@@ -1,4 +1,4 @@
-package io.sudostream.userservice.dao
+package io.sudostream.userreader.dao
 
 import java.net.URI
 import javax.net.ssl.{HostnameVerifier, SSLSession}
@@ -8,7 +8,7 @@ import akka.event.LoggingAdapter
 import akka.stream.Materializer
 import com.mongodb.connection.ClusterSettings
 import com.typesafe.config.ConfigFactory
-import io.sudostream.userservice.config.ActorSystemWrapper
+import io.sudostream.userreader.config.ActorSystemWrapper
 import org.mongodb.scala.connection.{NettyStreamFactoryFactory, SslSettings}
 import org.mongodb.scala.{Document, MongoClient, MongoClientSettings, MongoCollection, MongoDatabase, ServerAddress}
 

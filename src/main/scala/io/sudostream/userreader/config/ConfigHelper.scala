@@ -1,4 +1,4 @@
-package io.sudostream.userservice.config
+package io.sudostream.userreader.config
 
 import com.typesafe.config.ConfigFactory
 

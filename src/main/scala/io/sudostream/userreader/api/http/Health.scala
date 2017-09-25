@@ -1,4 +1,4 @@
-package io.sudostream.userservice.api.http
+package io.sudostream.userreader.api.http
 
 import akka.http.scaladsl.model.{ContentTypes, HttpEntity}
 import akka.http.scaladsl.server.Directives.{complete, get, path}

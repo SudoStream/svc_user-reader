@@ -1,4 +1,4 @@
-package io.sudostream.userservice.api.http
+package io.sudostream.userreader.api.http
 
 import java.time.Instant
 import java.util.UUID
@@ -14,9 +14,9 @@ import akka.stream.scaladsl.Source
 import akka.util.Timeout
 import io.sudostream.timetoteach.messages.events.SystemEvent
 import io.sudostream.timetoteach.messages.systemwide.{SystemEventType, TimeToTeachApplication}
-import io.sudostream.userservice.api.kafka.StreamingComponents
-import io.sudostream.userservice.config.ActorSystemWrapper
-import io.sudostream.userservice.dao.UserReaderDao
+import io.sudostream.userreader.api.kafka.StreamingComponents
+import io.sudostream.userreader.config.ActorSystemWrapper
+import io.sudostream.userreader.dao.UserReaderDao
 import org.apache.kafka.clients.producer.ProducerRecord
 
 import scala.concurrent.ExecutionContextExecutor

@@ -1,4 +1,4 @@
-package io.sudostream.userservice.dao
+package io.sudostream.userreader.dao
 
 import java.util
 
@@ -6,7 +6,7 @@ import akka.actor.ActorSystem
 import akka.event.LoggingAdapter
 import akka.stream.Materializer
 import io.sudostream.timetoteach.messages.systemwide.model._
-import io.sudostream.userservice.config.ActorSystemWrapper
+import io.sudostream.userreader.config.ActorSystemWrapper
 import org.bson.BsonValue
 import org.mongodb.scala.Document
 import org.mongodb.scala.bson.{BsonArray, BsonBoolean, BsonString}

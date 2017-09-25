@@ -1,7 +1,7 @@
-package io.sudostream.userservice.dao
+package io.sudostream.userreader.dao
 
 import io.sudostream.timetoteach.messages.systemwide.model.{Country, User}
-import io.sudostream.userservice.config.{ActorSystemWrapper, ConfigHelper}
+import io.sudostream.userreader.config.{ActorSystemWrapper, ConfigHelper}
 import org.scalatest.AsyncFlatSpec
 import org.scalatest.mockito.MockitoSugar
 

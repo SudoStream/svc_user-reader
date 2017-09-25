@@ -1,13 +1,13 @@
-package io.sudostream.userservice
+package io.sudostream.userreader
 
 import akka.actor.ActorSystem
 import akka.event.Logging
 import akka.http.scaladsl.{Http, HttpConnectionContext}
 import com.softwaremill.macwire.wire
-import io.sudostream.userservice.api.http.HttpRoutes
-import io.sudostream.userservice.api.kafka.StreamingComponents
-import io.sudostream.userservice.config.{ActorSystemWrapper, ConfigHelper}
-import io.sudostream.userservice.dao._
+import io.sudostream.userreader.api.http.HttpRoutes
+import io.sudostream.userreader.api.kafka.StreamingComponents
+import io.sudostream.userreader.config.{ActorSystemWrapper, ConfigHelper}
+import io.sudostream.userreader.dao._
 
 // running in IDE
 // -Djavax.net.ssl.keyStore=/etc/ssl/cacerts

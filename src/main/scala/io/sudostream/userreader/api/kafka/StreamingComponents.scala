@@ -1,10 +1,10 @@
-package io.sudostream.userservice.api.kafka
+package io.sudostream.userreader.api.kafka
 
 import akka.actor.ActorSystem
 import akka.kafka.ProducerSettings
 import akka.stream.Materializer
 import io.sudostream.timetoteach.kafka.serializing.SystemEventSerializer
-import io.sudostream.userservice.config.{ActorSystemWrapper, ConfigHelper}
+import io.sudostream.userreader.config.{ActorSystemWrapper, ConfigHelper}
 import org.apache.kafka.common.serialization.ByteArraySerializer
 
 import scala.concurrent.ExecutionContextExecutor
@@ -21,7 +21,7 @@ class StreamingComponents(configHelper: ConfigHelper, actorSystemWrapper: ActorS
     .withBootstrapServers(kafkaProducerBootServers)
 
   def definedSystemEventsTopic: String = {
-    val sink_topic = configHelper.config.getString("user-service.system_events_topic")
+    val sink_topic = configHelper.config.getString("user-reader.system_events_topic")
     log.info(s"Sink topic is '$sink_topic'")
     sink_topic
   }
