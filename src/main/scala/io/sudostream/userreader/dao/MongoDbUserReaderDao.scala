@@ -99,7 +99,7 @@ sealed class MongoDbUserReaderDao(mongoFindQueriesProxy: MongoFindQueriesProxy,
           socialIdElem: BsonValue <- socialNetworkIdsAsBsonList
           socialIdDoc = socialIdElem.asDocument()
 
-          socialNetworkName: BsonString = socialIdDoc.getString("socialNetwork")
+          socialNetworkName: BsonString = socialIdDoc.getString("socialNetworkName")
           socialNetworkUserId: BsonString = socialIdDoc.getString("id")
         } yield (socialNetworkName.getValue, socialNetworkUserId.getValue)
 

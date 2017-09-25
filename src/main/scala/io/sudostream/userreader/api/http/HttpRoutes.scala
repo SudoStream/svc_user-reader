@@ -36,10 +36,9 @@ class HttpRoutes(dao: UserReaderDao,
   implicit val timeout: Timeout = Timeout(30 seconds)
 
   val routes: Route = path("api" / "users" ) {
-
     get {
       val initialRequestReceived = Instant.now().toEpochMilli
-      log.debug("Called 'api/users' and now getting All the E's and O's from the DAO")
+      log.debug("Called 'api/users' and now getting All the users from the DAO")
 
       val usersFuture = dao.extractAllUsers
 
@@ -71,10 +70,7 @@ class HttpRoutes(dao: UserReaderDao,
         case Failure(ex) => failWith(ex)
       }
 
-    }
-    path(RemainingPath) { remaining =>
-      println(s".... remaining ... ${remaining.toString()}")
-      failWith(new RuntimeException)
+
     }
 
   } ~ health

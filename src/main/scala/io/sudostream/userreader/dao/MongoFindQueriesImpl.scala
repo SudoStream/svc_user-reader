@@ -6,10 +6,10 @@ import scala.concurrent.Future
 
 class MongoFindQueriesImpl(mongoDbConnectionWrapper: MongoDbConnectionWrapper) extends MongoFindQueriesProxy {
 
-  val esAndOsCollection: MongoCollection[Document] = mongoDbConnectionWrapper.getUsersCollection
+  val usersCollection: MongoCollection[Document] = mongoDbConnectionWrapper.getUsersCollection
 
   def findAllUsers: Future[Seq[Document]] = {
-    val esAndOsMongoDocuments: FindObservable[Document] = esAndOsCollection.find(Document())
+    val esAndOsMongoDocuments: FindObservable[Document] = usersCollection.find(Document())
     esAndOsMongoDocuments.toFuture()
   }
 
