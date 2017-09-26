@@ -66,10 +66,8 @@ sealed class MongoDbUserReaderDao(mongoFindQueriesProxy: MongoFindQueriesProxy,
     }
   }
 
-  override def extractAllUsers: Future[Seq[User]] = {
-    val allUsersFutureDocuments: Future[Seq[Document]] = mongoFindQueriesProxy.findAllUsers
-
-    allUsersFutureDocuments map {
+  private def createUserFromDocuments( userDocuments: Future[Seq[Document]]) : Future[Seq[User]] = {
+    userDocuments map {
       allUsersAsMongoDocuments =>
         val seqOfUsers: Seq[Try[User]] =
           for {
@@ -88,6 +86,16 @@ sealed class MongoDbUserReaderDao(mongoFindQueriesProxy: MongoFindQueriesProxy,
           seqOfUsers map { userTry => userTry.get }
         }
     }
+  }
+
+  override def extractAllUsers: Future[Seq[User]] = {
+    val allUsersFutureDocuments: Future[Seq[Document]] = mongoFindQueriesProxy.findAllUsers
+    createUserFromDocuments(allUsersFutureDocuments)
+  }
+
+  override def extractUserWithSocialIds(socialNetwork: SocialNetwork, socialNetworkId: String): Future[Seq[User]] = {
+    val userWithSocialIdsFutureDocuments: Future[Seq[Document]] = mongoFindQueriesProxy.extractUserWithSocialIds(socialNetwork, socialNetworkId)
+    createUserFromDocuments(userWithSocialIdsFutureDocuments)
   }
 
   private[dao] def extractSocialNetworkIds(maybeSocialNetworkIds: Option[BsonArray]): List[SocialNetworkIdWrapper] = {
@@ -218,7 +226,7 @@ sealed class MongoDbUserReaderDao(mongoFindQueriesProxy: MongoFindQueriesProxy,
               address = schoolTuple._3,
               postCode = schoolTuple._4,
               telephone = schoolTuple._5,
-              localAuthority = LocalAuthority.SCOTLAND__ABERDEEN_CITY,
+              localAuthority = localAuthority,
               country = country
             )
         }
