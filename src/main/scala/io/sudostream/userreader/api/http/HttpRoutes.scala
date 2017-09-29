@@ -94,8 +94,6 @@ class HttpRoutes(dao: UserReaderDao,
                 out.flush()
                 out.close()
                 val userBytes = out.toByteArray
-
-
                 complete(HttpEntity(ContentTypes.`application/octet-stream`, userBytes))
               } else {
                 reject
