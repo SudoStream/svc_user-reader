@@ -65,7 +65,7 @@ class HttpRoutes(dao: UserReaderDao,
                 log.info(s"Received all ${elem.size} users from the DAO")
 
                 SystemEvent(
-                  eventType = SystemEventType.SCOTTISH_ES_AND_OS_REQUESTED_EVENT,
+                  eventType = SystemEventType.SPECIFIC_USER_REQUESTED,
                   requestFingerprint = UUID.randomUUID().toString,
                   requestingSystem = TimeToTeachApplication.HTTP,
                   requestingSystemExtraInfo = Option.empty,
@@ -117,7 +117,7 @@ class HttpRoutes(dao: UserReaderDao,
               log.info(s"Received all ${elem.size} users from the DAO")
 
               SystemEvent(
-                eventType = SystemEventType.SCOTTISH_ES_AND_OS_REQUESTED_EVENT,
+                eventType = SystemEventType.ALL_USERS_REQUESTED,
                 requestFingerprint = UUID.randomUUID().toString,
                 requestingSystem = TimeToTeachApplication.HTTP,
                 requestingSystemExtraInfo = Option.empty,
