@@ -9,4 +9,6 @@ trait UserReaderDao {
   def extractAllUsers: Future[Seq[User]]
 
   def extractUserWithSocialIds(socialNetwork: SocialNetwork, socialNetworkId: String): Future[Seq[User]]
+
+  def extractUserWithTimeToTeachUserId(timeToTeachUserId: String): Future[Seq[User]]
 }

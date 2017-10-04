@@ -96,5 +96,9 @@ class MongoFindQueriesProxyStub extends MongoFindQueriesProxy {
     }
   }
 
-
+  override def extractUserWithTimeToTeachUserId(timeToTeachUserId: String): Future[Seq[Document]] = {
+    Future {
+      List(userAndy, userYvonne)
+    }
+  }
 }

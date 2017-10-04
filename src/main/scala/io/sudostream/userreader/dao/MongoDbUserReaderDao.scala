@@ -94,20 +94,30 @@ sealed class MongoDbUserReaderDao(mongoFindQueriesProxy: MongoFindQueriesProxy,
   }
 
   override def extractUserWithSocialIds(socialNetwork: SocialNetwork, socialNetworkId: String): Future[Seq[User]] = {
-    val userWithSocialIdsFutureDocuments: Future[Seq[Document]] = mongoFindQueriesProxy.extractUserWithSocialIds(socialNetwork, socialNetworkId)
+    val userWithSocialIdsFutureDocuments: Future[Seq[Document]] =
+      mongoFindQueriesProxy.extractUserWithSocialIds(socialNetwork, socialNetworkId)
+
+    createUserFromDocuments(userWithSocialIdsFutureDocuments)
+  }
+
+  override def extractUserWithTimeToTeachUserId(timeToTeachUserId: String): Future[Seq[User]] = {
+    val userWithSocialIdsFutureDocuments: Future[Seq[Document]] =
+      mongoFindQueriesProxy.extractUserWithTimeToTeachUserId(timeToTeachUserId)
+
     createUserFromDocuments(userWithSocialIdsFutureDocuments)
   }
 
   private[dao] def extractSocialNetworkIds(maybeSocialNetworkIds: Option[BsonArray]): List[SocialNetworkIdWrapper] = {
     maybeSocialNetworkIds match {
       case Some(socialNetworkIdsAsBsonArray) =>
-        val socialNetworkIdsAsBsonList: util.List[BsonValue] = socialNetworkIdsAsBsonArray.getValues
+        println(s"is it a bson array: ${socialNetworkIdsAsBsonArray.toString}")
+        val socialNetworkIdsAsBsonList = socialNetworkIdsAsBsonArray.toList
 
-        val socialNetworkIdsDetailTupleSeq: Seq[(String, String)] = for {
-          socialIdElem: BsonValue <- socialNetworkIdsAsBsonList
+        val socialNetworkIdsDetailTupleSeq = for {
+          socialIdElem <- socialNetworkIdsAsBsonList
           socialIdDoc = socialIdElem.asDocument()
 
-          socialNetworkName: BsonString = socialIdDoc.getString("socialNetworkName")
+          socialNetworkName: BsonString = socialIdDoc.getString("socialNetwork")
           socialNetworkUserId: BsonString = socialIdDoc.getString("id")
         } yield (socialNetworkName.getValue, socialNetworkUserId.getValue)
 

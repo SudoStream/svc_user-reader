@@ -50,57 +50,63 @@ class HttpRoutes(dao: UserReaderDao,
 
   val routes: Route =
     path("api" / "user") {
-      parameters('socialNetworkName, 'socialNetworkUserId) { (socialNetworkName, socialNetworkUserId) =>
-        get {
-          val initialRequestReceived = Instant.now().toEpochMilli
-          log.debug(s"Looking for SocialNetwork ${socialNetworkName} & id ${socialNetworkUserId}")
+      parameters('socialNetworkName.?, 'socialNetworkUserId.?, 'timeToTeachUserId.?) {
+        (socialNetworkNameOption, socialNetworkUserIdOption, timeToTeachUserIdOption) =>
+          get {
+            val initialRequestReceived = Instant.now().toEpochMilli
+            log.debug(s"Looking for SocialNetwork ${socialNetworkNameOption.getOrElse("NONE")} & id " +
+              s"${socialNetworkUserIdOption.getOrElse("NONE")} || tttId ${timeToTeachUserIdOption.getOrElse("NONE")}")
 
-          val userMaybe = dao.extractUserWithSocialIds(
-            convertToSocialNetworkName(socialNetworkName),
-            socialNetworkUserId)
-
-          Source.fromFuture(userMaybe)
-            .map {
-              elem =>
-                log.info(s"Received all ${elem.size} users from the DAO")
-
-                SystemEvent(
-                  eventType = SystemEventType.SPECIFIC_USER_REQUESTED,
-                  requestFingerprint = UUID.randomUUID().toString,
-                  requestingSystem = TimeToTeachApplication.HTTP,
-                  requestingSystemExtraInfo = Option.empty,
-                  requestingUsername = Option.empty,
-                  originalUTCTimeOfRequest = initialRequestReceived,
-                  processedUTCTime = Instant.now().toEpochMilli,
-                  extraInfo = Option.empty
-                )
+            val userMaybe = if (timeToTeachUserIdOption.isDefined) {
+              dao.extractUserWithTimeToTeachUserId(timeToTeachUserIdOption.get)
+            } else {
+              dao.extractUserWithSocialIds(
+                convertToSocialNetworkName(socialNetworkNameOption.getOrElse("")),
+                socialNetworkUserIdOption.getOrElse(""))
             }
-            .map {
-              elem =>
-                new ProducerRecord[Array[Byte], SystemEvent](streamingComponents.definedSystemEventsTopic, elem)
-            }
-            .runWith(Producer.plainSink(streamingComponents.producerSettings))
 
-          onComplete(userMaybe) {
-            case Success(users) =>
-              if (users.size == 1) {
-                val user = users.head
+            Source.fromFuture(userMaybe)
+              .map {
+                elem =>
+                  log.info(s"Received ${elem.size} user(s) from the DAO")
 
-                val writer: DatumWriter[User] = new SpecificDatumWriter[User](User.SCHEMA$)
-                val out = new ByteArrayOutputStream()
-                val encoder = new EncoderFactory().binaryEncoder(out, null)
-                writer.write(user, encoder)
-                encoder.flush()
-                out.flush()
-                out.close()
-                val userBytes = out.toByteArray
-                complete(HttpEntity(ContentTypes.`application/octet-stream`, userBytes))
-              } else {
-                reject
+                  SystemEvent(
+                    eventType = SystemEventType.SPECIFIC_USER_REQUESTED,
+                    requestFingerprint = UUID.randomUUID().toString,
+                    requestingSystem = TimeToTeachApplication.HTTP,
+                    requestingSystemExtraInfo = Option.empty,
+                    requestingUsername = Option.empty,
+                    originalUTCTimeOfRequest = initialRequestReceived,
+                    processedUTCTime = Instant.now().toEpochMilli,
+                    extraInfo = Option.empty
+                  )
               }
-            case Failure(ex) => failWith(ex)
+              .map {
+                elem =>
+                  new ProducerRecord[Array[Byte], SystemEvent](streamingComponents.definedSystemEventsTopic, elem)
+              }
+              .runWith(Producer.plainSink(streamingComponents.producerSettings))
+
+            onComplete(userMaybe) {
+              case Success(users) =>
+                if (users.size == 1) {
+                  val user = users.head
+
+                  val writer: DatumWriter[User] = new SpecificDatumWriter[User](User.SCHEMA$)
+                  val out = new ByteArrayOutputStream()
+                  val encoder = new EncoderFactory().binaryEncoder(out, null)
+                  writer.write(user, encoder)
+                  encoder.flush()
+                  out.flush()
+                  out.close()
+                  val userBytes = out.toByteArray
+                  complete(HttpEntity(ContentTypes.`application/octet-stream`, userBytes))
+                } else {
+                  reject
+                }
+              case Failure(ex) => failWith(ex)
+            }
           }
-        }
       }
     } ~ path("api" / "users") {
       get {

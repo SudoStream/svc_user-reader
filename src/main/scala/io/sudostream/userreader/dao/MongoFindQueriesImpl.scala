@@ -16,16 +16,22 @@ class MongoFindQueriesImpl(mongoDbConnectionWrapper: MongoDbConnectionWrapper) e
   }
 
   override def
-  extractUserWithSocialIds(socialNetwork: SocialNetwork, socialNetworkId: String) : Future[Seq[Document]] = {
+  extractUserWithSocialIds(socialNetwork: SocialNetwork, socialNetworkId: String): Future[Seq[Document]] = {
     val findMatcher = Document(
       "socialNetworkIds" -> BsonArray(
         Document(
-        "socialNetworkName" -> BsonString(socialNetwork.toString.toUpperCase),
-        "id" -> BsonString(socialNetworkId)
+          "socialNetwork" -> BsonString(socialNetwork.toString.toUpperCase),
+          "id" -> BsonString(socialNetworkId)
         )
       )
     )
 
+    val usersMongoDocuments: FindObservable[Document] = usersCollection.find(findMatcher)
+    usersMongoDocuments.toFuture()
+  }
+
+  override def extractUserWithTimeToTeachUserId(timeToTeachUserId: String): Future[Seq[Document]] = {
+    val findMatcher = Document("_id" -> timeToTeachUserId)
     val usersMongoDocuments: FindObservable[Document] = usersCollection.find(findMatcher)
     usersMongoDocuments.toFuture()
   }
