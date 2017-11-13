@@ -15,8 +15,8 @@ import io.sudostream.userreader.dao._
 // LOCAL_MONGO_DB=true
 
 object Main extends App {
-  System.setProperty("javax.net.ssl.keyStore", "/etc/ssl/cacerts")
-  System.setProperty("javax.net.ssl.trustStore", "/etc/ssl/cacerts")
+//  System.setProperty("javax.net.ssl.keyStore", "/etc/ssl/cacerts")
+//  System.setProperty("javax.net.ssl.trustStore", "/etc/ssl/cacerts")
 
   lazy val configHelper: ConfigHelper = wire[ConfigHelper]
   lazy val streamingComponents = wire[StreamingComponents]
