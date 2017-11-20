@@ -52,6 +52,9 @@ sealed class MongoDbUserReaderDao(mongoFindQueriesProxy: MongoFindQueriesProxy,
 
       val theSchools: List[SchoolWrapper] = extractSchools(singleUserDoc.get[BsonArray]("schools"))
 
+//      val theUserPreferences: Option[UserPreferences] = extractUserPreferences
+      val theUserPreferences: Option[UserPreferences] = None
+
       User(
         timeToTeachId = theTimeToTeachId,
         socialNetworkIds = theSocialNetworkIds,
@@ -61,7 +64,8 @@ sealed class MongoDbUserReaderDao(mongoFindQueriesProxy: MongoFindQueriesProxy,
         imageUrl = theImageUrl,
         emails = emailDetails,
         userRole = theUserRole,
-        schools = theSchools
+        schools = theSchools,
+        userPreferences = theUserPreferences
       )
     }
   }
