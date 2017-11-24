@@ -54,6 +54,19 @@ class MongoDbUserReaderDaoTest extends AsyncFlatSpec with MockitoSugar {
     assert(userPreferences.allSchoolTimes.head.schoolId === "school1234")
   }
 
+  "Extract UserPreferences when has school times created" should "return User Preferences with correct school times" in {
+    val userReaderDao: MongoDbUserReaderDao = new MongoDbUserReaderDao(mongoFindQueries, actorSystemWrapper)
+    val maybeUserPrefs = userReaderDao.extractUserPreferences(createValidUserPreferencesBsonDocument())
+    val userPreferences = maybeUserPrefs.get
+    assert(userPreferences.allSchoolTimes.head.schoolStartTime === "9:00 AM")
+    assert(userPreferences.allSchoolTimes.head.schoolEndTime === "3:00 PM")
+    assert(userPreferences.allSchoolTimes.head.morningBreakStartTime === "10:30 AM")
+    assert(userPreferences.allSchoolTimes.head.morningBreakEndTime === "10:45 AM")
+    assert(userPreferences.allSchoolTimes.head.lunchStartTime === "12:00 PM")
+    assert(userPreferences.allSchoolTimes.head.lunchEndTime === "1:00 PM")
+  }
+
+
   "Extract UserPreferences when has school times created" should "return User Preferences with a single school with 1 class instance " in {
     val userReaderDao: MongoDbUserReaderDao = new MongoDbUserReaderDao(mongoFindQueries, actorSystemWrapper)
     val maybeUserPrefs = userReaderDao.extractUserPreferences(createValidUserPreferencesBsonDocument())

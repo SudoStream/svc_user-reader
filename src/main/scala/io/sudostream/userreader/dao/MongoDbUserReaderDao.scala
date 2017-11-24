@@ -171,11 +171,11 @@ sealed class MongoDbUserReaderDao(mongoFindQueriesProxy: MongoFindQueriesProxy,
               schoolTimes = SchoolTimes(
                 schoolId = schoolTimesAsBsonDoc.getString("schoolId").getValue,
                 schoolStartTime = schoolTimesAsBsonDoc.getString("schoolStartTime").getValue,
-                morningBreakStartTime = schoolTimesAsBsonDoc.getString("schoolStartTime").getValue,
-                morningBreakEndTime = schoolTimesAsBsonDoc.getString("schoolStartTime").getValue,
-                lunchStartTime = schoolTimesAsBsonDoc.getString("schoolStartTime").getValue,
-                lunchEndTime = schoolTimesAsBsonDoc.getString("schoolStartTime").getValue,
-                schoolEndTime = schoolTimesAsBsonDoc.getString("schoolStartTime").getValue,
+                morningBreakStartTime = schoolTimesAsBsonDoc.getString("morningBreakStartTime").getValue,
+                morningBreakEndTime = schoolTimesAsBsonDoc.getString("morningBreakEndTime").getValue,
+                lunchStartTime = schoolTimesAsBsonDoc.getString("lunchStartTime").getValue,
+                lunchEndTime = schoolTimesAsBsonDoc.getString("lunchEndTime").getValue,
+                schoolEndTime = schoolTimesAsBsonDoc.getString("schoolEndTime").getValue,
                 userTeachesTheseClasses = allClassesForSchool
               )
             } yield schoolTimes
