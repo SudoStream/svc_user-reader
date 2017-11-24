@@ -5,11 +5,12 @@ import java.util
 import akka.actor.ActorSystem
 import akka.event.LoggingAdapter
 import akka.stream.Materializer
+import io.sudostream.timetoteach.messages.scottish.ScottishCurriculumLevel
 import io.sudostream.timetoteach.messages.systemwide.model._
 import io.sudostream.userreader.config.ActorSystemWrapper
 import org.bson.BsonValue
 import org.mongodb.scala.Document
-import org.mongodb.scala.bson.{BsonArray, BsonBoolean, BsonString}
+import org.mongodb.scala.bson.{BsonArray, BsonBoolean, BsonDocument, BsonString}
 
 import scala.collection.JavaConversions._
 import scala.concurrent.{ExecutionContextExecutor, Future}
@@ -52,8 +53,7 @@ sealed class MongoDbUserReaderDao(mongoFindQueriesProxy: MongoFindQueriesProxy,
 
       val theSchools: List[SchoolWrapper] = extractSchools(singleUserDoc.get[BsonArray]("schools"))
 
-//      val theUserPreferences: Option[UserPreferences] = extractUserPreferences
-      val theUserPreferences: Option[UserPreferences] = None
+      val theUserPreferences: Option[UserPreferences] = extractUserPreferences(singleUserDoc.get[BsonDocument]("userPreferences"))
 
       User(
         timeToTeachId = theTimeToTeachId,
@@ -70,7 +70,7 @@ sealed class MongoDbUserReaderDao(mongoFindQueriesProxy: MongoFindQueriesProxy,
     }
   }
 
-  private def createUserFromDocuments( userDocuments: Future[Seq[Document]]) : Future[Seq[User]] = {
+  private def createUserFromDocuments(userDocuments: Future[Seq[Document]]): Future[Seq[User]] = {
     userDocuments map {
       allUsersAsMongoDocuments =>
         val seqOfUsers: Seq[Try[User]] =
@@ -109,6 +109,82 @@ sealed class MongoDbUserReaderDao(mongoFindQueriesProxy: MongoFindQueriesProxy,
       mongoFindQueriesProxy.extractUserWithTimeToTeachUserId(timeToTeachUserId)
 
     createUserFromDocuments(userWithSocialIdsFutureDocuments)
+  }
+
+  def extractCurriculumLevels(curriculumLevelsAsBsonArray: BsonArray): List[CurriculumLevelWrapper] = {
+    {for {
+      curriculumLevelWrapperAsBsonValue <- curriculumLevelsAsBsonArray
+      curriculumLevelWrapperAsBsonDoc = curriculumLevelWrapperAsBsonValue.asInstanceOf[BsonDocument]
+      curriculumLevelAsBsonDoc = curriculumLevelWrapperAsBsonDoc.getDocument("curriculumLevel")
+      country = curriculumLevelAsBsonDoc.getString("country").getValue match {
+        case "EIRE" => Country.EIRE
+        case "ENGLAND" => Country.ENGLAND
+        case "NORTHERN_IRELAND" => Country.NORTHERN_IRELAND
+        case "SCOTLAND" => Country.SCOTLAND
+        case "WALES" => Country.WALES
+        case other: String => Country.UNKNOWN
+      }
+      scottishCurriculumLevel = curriculumLevelAsBsonDoc.getString("scottishCurriculumLevel").getValue match {
+        case "EARLY" => Some(ScottishCurriculumLevel.EARLY)
+        case "FIRST" => Some(ScottishCurriculumLevel.FIRST)
+        case "SECOND" => Some(ScottishCurriculumLevel.SECOND)
+        case "THIRD" => Some(ScottishCurriculumLevel.THIRD)
+        case "FOURTH" => Some(ScottishCurriculumLevel.FOURTH)
+        case _ => None
+      }
+    } yield CurriculumLevelWrapper(
+      curriculumLevel = CurriculumLevel(
+        country = country,
+        scottishCurriculumLevel = scottishCurriculumLevel
+      )
+    )}.toList
+  }
+
+  def extractSchoolClassesForSchool(schoolTimesAsBsonDoc: BsonDocument): List[SchoolClass] = {
+    val schoolClassesAsBsonArray = schoolTimesAsBsonDoc.getArray("userTeachesTheseClasses")
+
+    val schoolClasses = for {
+      taughtClassAsBsonValue <- schoolClassesAsBsonArray
+      taughtClassAsBsonDoc = taughtClassAsBsonValue.asInstanceOf[BsonDocument]
+      className: String = taughtClassAsBsonDoc.getString("className").getValue
+      curriculumLevels: List[CurriculumLevelWrapper] = extractCurriculumLevels(taughtClassAsBsonDoc.getArray("curriculumLevels"))
+    } yield SchoolClass(
+      className = className,
+      curriculumLevels = curriculumLevels)
+
+    schoolClasses.toList
+  }
+
+  private[dao] def extractUserPreferences(maybeUserPreferences: Option[BsonDocument]): Option[UserPreferences] = {
+    maybeUserPreferences match {
+      case Some(userPrefs) =>
+        if (userPrefs.isEmpty) None
+        else {
+          val allSchoolTimesMongoArray = userPrefs.getArray("allSchoolTimes")
+
+          val schoolTimesSequence = {
+            for {
+              schoolTimesBsonValue <- allSchoolTimesMongoArray
+              schoolTimesAsBsonDoc = schoolTimesBsonValue.asInstanceOf[BsonDocument]
+              allClassesForSchool: List[SchoolClass] = extractSchoolClassesForSchool(schoolTimesAsBsonDoc)
+
+              schoolTimes = SchoolTimes(
+                schoolId = schoolTimesAsBsonDoc.getString("schoolId").getValue,
+                schoolStartTime = schoolTimesAsBsonDoc.getString("schoolStartTime").getValue,
+                morningBreakStartTime = schoolTimesAsBsonDoc.getString("schoolStartTime").getValue,
+                morningBreakEndTime = schoolTimesAsBsonDoc.getString("schoolStartTime").getValue,
+                lunchStartTime = schoolTimesAsBsonDoc.getString("schoolStartTime").getValue,
+                lunchEndTime = schoolTimesAsBsonDoc.getString("schoolStartTime").getValue,
+                schoolEndTime = schoolTimesAsBsonDoc.getString("schoolStartTime").getValue,
+                userTeachesTheseClasses = allClassesForSchool
+              )
+            } yield schoolTimes
+          }.toList
+
+          Some(UserPreferences(allSchoolTimes = schoolTimesSequence))
+        }
+      case None => None
+    }
   }
 
   private[dao] def extractSocialNetworkIds(maybeSocialNetworkIds: Option[BsonArray]): List[SocialNetworkIdWrapper] = {
