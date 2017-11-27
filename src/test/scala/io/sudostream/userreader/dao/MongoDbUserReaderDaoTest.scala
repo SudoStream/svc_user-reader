@@ -24,6 +24,17 @@ class MongoDbUserReaderDaoTest extends AsyncFlatSpec with MockitoSugar {
     }
   }
 
+  "Extracting All Users from Dao" should "have 2 users that started on 2017-11-27" in {
+    val userReaderDao: UserReaderDao = new MongoDbUserReaderDao(mongoFindQueries, actorSystemWrapper)
+    val allUsersFuture: Future[Seq[User]] = userReaderDao.extractAllUsers
+
+    allUsersFuture map {
+      users: Seq[User] =>
+        assert(users.toList.head.userAccountCreated.dateSignedUp_Iso8601 === "2017-11-27")
+    }
+  }
+
+
   "Extract UserPreferences when not present" should "return None" in {
     val userReaderDao: MongoDbUserReaderDao = new MongoDbUserReaderDao(mongoFindQueries, actorSystemWrapper)
     assert(userReaderDao.extractUserPreferences(createNoBsonDocument()) === None)

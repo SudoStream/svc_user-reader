@@ -29,6 +29,10 @@ class MongoFindQueriesProxyStub extends MongoFindQueriesProxy {
       )
     ),
     "userRole" -> "TEACHER",
+    "userAccountCreated" -> Document(
+      "dateSignedUp_Iso8601" -> "2017-11-27",
+      "timeSignedUp_Iso8601" -> "16:29:31.783"
+    ),
     "schools" -> BsonArray(
       Document(
         "_id" -> "schoolId333",
@@ -62,6 +66,10 @@ class MongoFindQueriesProxyStub extends MongoFindQueriesProxy {
       )
     ),
     "userRole" -> "ADMIN",
+    "userAccountCreated" -> Document(
+      "dateSignedUp_Iso8601" -> "2017-11-27",
+      "timeSignedUp_Iso8601" -> "16:29:31.783"
+    ),
     "schools" -> BsonArray()
   )
 

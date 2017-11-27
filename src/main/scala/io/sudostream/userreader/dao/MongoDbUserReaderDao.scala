@@ -51,6 +51,13 @@ sealed class MongoDbUserReaderDao(mongoFindQueriesProxy: MongoFindQueriesProxy,
         case _ => UserRole.OTHER
       }
 
+      val theUserSignedUpDetails = singleUserDoc.get[BsonDocument]("userAccountCreated").getOrElse(
+        BsonDocument(
+          "dateSignedUp_Iso8601" -> "2017-01-01",
+          "timeSignedUp_Iso8601" -> "01:00"
+        )
+      )
+
       val theSchools: List[SchoolWrapper] = extractSchools(singleUserDoc.get[BsonArray]("schools"))
 
       val theUserPreferences: Option[UserPreferences] = extractUserPreferences(singleUserDoc.get[BsonDocument]("userPreferences"))
@@ -64,6 +71,10 @@ sealed class MongoDbUserReaderDao(mongoFindQueriesProxy: MongoFindQueriesProxy,
         imageUrl = theImageUrl,
         emails = emailDetails,
         userRole = theUserRole,
+        userAccountCreated = UserAccountCreatedDetails(
+          dateSignedUp_Iso8601 = theUserSignedUpDetails.getString("dateSignedUp_Iso8601").getValue,
+          timeSignedUp_Iso8601 = theUserSignedUpDetails.getString("timeSignedUp_Iso8601").getValue
+        ),
         schools = theSchools,
         userPreferences = theUserPreferences
       )
@@ -112,32 +123,34 @@ sealed class MongoDbUserReaderDao(mongoFindQueriesProxy: MongoFindQueriesProxy,
   }
 
   def extractCurriculumLevels(curriculumLevelsAsBsonArray: BsonArray): List[CurriculumLevelWrapper] = {
-    {for {
-      curriculumLevelWrapperAsBsonValue <- curriculumLevelsAsBsonArray
-      curriculumLevelWrapperAsBsonDoc = curriculumLevelWrapperAsBsonValue.asInstanceOf[BsonDocument]
-      curriculumLevelAsBsonDoc = curriculumLevelWrapperAsBsonDoc.getDocument("curriculumLevel")
-      country = curriculumLevelAsBsonDoc.getString("country").getValue match {
-        case "EIRE" => Country.EIRE
-        case "ENGLAND" => Country.ENGLAND
-        case "NORTHERN_IRELAND" => Country.NORTHERN_IRELAND
-        case "SCOTLAND" => Country.SCOTLAND
-        case "WALES" => Country.WALES
-        case other: String => Country.UNKNOWN
-      }
-      scottishCurriculumLevel = curriculumLevelAsBsonDoc.getString("scottishCurriculumLevel").getValue match {
-        case "EARLY" => Some(ScottishCurriculumLevel.EARLY)
-        case "FIRST" => Some(ScottishCurriculumLevel.FIRST)
-        case "SECOND" => Some(ScottishCurriculumLevel.SECOND)
-        case "THIRD" => Some(ScottishCurriculumLevel.THIRD)
-        case "FOURTH" => Some(ScottishCurriculumLevel.FOURTH)
-        case _ => None
-      }
-    } yield CurriculumLevelWrapper(
-      curriculumLevel = CurriculumLevel(
-        country = country,
-        scottishCurriculumLevel = scottishCurriculumLevel
+    {
+      for {
+        curriculumLevelWrapperAsBsonValue <- curriculumLevelsAsBsonArray
+        curriculumLevelWrapperAsBsonDoc = curriculumLevelWrapperAsBsonValue.asInstanceOf[BsonDocument]
+        curriculumLevelAsBsonDoc = curriculumLevelWrapperAsBsonDoc.getDocument("curriculumLevel")
+        country = curriculumLevelAsBsonDoc.getString("country").getValue match {
+          case "EIRE" => Country.EIRE
+          case "ENGLAND" => Country.ENGLAND
+          case "NORTHERN_IRELAND" => Country.NORTHERN_IRELAND
+          case "SCOTLAND" => Country.SCOTLAND
+          case "WALES" => Country.WALES
+          case other: String => Country.UNKNOWN
+        }
+        scottishCurriculumLevel = curriculumLevelAsBsonDoc.getString("scottishCurriculumLevel").getValue match {
+          case "EARLY" => Some(ScottishCurriculumLevel.EARLY)
+          case "FIRST" => Some(ScottishCurriculumLevel.FIRST)
+          case "SECOND" => Some(ScottishCurriculumLevel.SECOND)
+          case "THIRD" => Some(ScottishCurriculumLevel.THIRD)
+          case "FOURTH" => Some(ScottishCurriculumLevel.FOURTH)
+          case _ => None
+        }
+      } yield CurriculumLevelWrapper(
+        curriculumLevel = CurriculumLevel(
+          country = country,
+          scottishCurriculumLevel = scottishCurriculumLevel
+        )
       )
-    )}.toList
+    }.toList
   }
 
   def extractSchoolClassesForSchool(schoolTimesAsBsonDoc: BsonDocument): List[SchoolClass] = {
