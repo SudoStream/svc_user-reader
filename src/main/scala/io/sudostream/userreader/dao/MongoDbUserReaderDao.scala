@@ -300,17 +300,40 @@ sealed class MongoDbUserReaderDao(mongoFindQueriesProxy: MongoFindQueriesProxy,
         val schools = schoolTupleSeq map {
           schoolTuple =>
             val localAuthority: LocalAuthority = schoolTuple._6 match {
+              case "SCOTLAND__GRANT_MAINTAINED" => LocalAuthority.SCOTLAND__GRANT_MAINTAINED
               case "SCOTLAND__ABERDEEN_CITY" => LocalAuthority.SCOTLAND__ABERDEEN_CITY
               case "SCOTLAND__ABERDEENSHIRE" => LocalAuthority.SCOTLAND__ABERDEENSHIRE
               case "SCOTLAND__ANGUS" => LocalAuthority.SCOTLAND__ANGUS
               case "SCOTLAND__ARGYLL_AND_BUTE" => LocalAuthority.SCOTLAND__ARGYLL_AND_BUTE
-              case "SCOTLAND__EDINBURGH_CITY" => LocalAuthority.SCOTLAND__EDINBURGH_CITY
+              case "SCOTLAND__COMHAIRLE_NAN_EILEAN_SIAR" => LocalAuthority.SCOTLAND__COMHAIRLE_NAN_EILEAN_SIAR
               case "SCOTLAND__CLACKMANNANSHIRE" => LocalAuthority.SCOTLAND__CLACKMANNANSHIRE
               case "SCOTLAND__DUMFRIES_AND_GALLOWAY" => LocalAuthority.SCOTLAND__DUMFRIES_AND_GALLOWAY
               case "SCOTLAND__DUNDEE_CITY" => LocalAuthority.SCOTLAND__DUNDEE_CITY
               case "SCOTLAND__EAST_AYRSHIRE" => LocalAuthority.SCOTLAND__EAST_AYRSHIRE
-              case "SCOTLAND__STIRLING" => LocalAuthority.SCOTLAND__STIRLING
+              case "SCOTLAND__EAST_DUMBARTONSHIRE" => LocalAuthority.SCOTLAND__EAST_DUMBARTONSHIRE
+              case "SCOTLAND__EDINBURGH_CITY" => LocalAuthority.SCOTLAND__EDINBURGH_CITY
+              case "SCOTLAND__EAST_LOTHIAN" => LocalAuthority.SCOTLAND__EAST_LOTHIAN
+              case "SCOTLAND__EAST_RENFREWSHIRE" => LocalAuthority.SCOTLAND__EAST_RENFREWSHIRE
+              case "SCOTLAND__FALKIRK" => LocalAuthority.SCOTLAND__FALKIRK
+              case "SCOTLAND__FIFE" => LocalAuthority.SCOTLAND__FIFE
               case "SCOTLAND__GLASGOW" => LocalAuthority.SCOTLAND__GLASGOW
+              case "SCOTLAND__HIGHLAND" => LocalAuthority.SCOTLAND__HIGHLAND
+              case "SCOTLAND__INVERCLYDE" => LocalAuthority.SCOTLAND__INVERCLYDE
+              case "SCOTLAND__MIDLOTHIAN" => LocalAuthority.SCOTLAND__MIDLOTHIAN
+              case "SCOTLAND__MORAY" => LocalAuthority.SCOTLAND__MORAY
+              case "SCOTLAND__NORTH_AYRSHIRE" => LocalAuthority.SCOTLAND__NORTH_AYRSHIRE
+              case "SCOTLAND__NORTH_LANARKSHIRE" => LocalAuthority.SCOTLAND__NORTH_LANARKSHIRE
+              case "SCOTLAND__ORKNEY" => LocalAuthority.SCOTLAND__ORKNEY
+              case "SCOTLAND__PERTH_AND_KINROSS" => LocalAuthority.SCOTLAND__PERTH_AND_KINROSS
+              case "SCOTLAND__RENFREWSHIRE" => LocalAuthority.SCOTLAND__RENFREWSHIRE
+              case "SCOTLAND__SCOTTISH_BORDERS" => LocalAuthority.SCOTLAND__SCOTTISH_BORDERS
+              case "SCOTLAND__SHETLAND_ISLANDS" => LocalAuthority.SCOTLAND__SHETLAND_ISLANDS
+              case "SCOTLAND__SOUTH_AYRSHIRE" => LocalAuthority.SCOTLAND__SOUTH_AYRSHIRE
+              case "SCOTLAND__SOUTH_LANARKSHIRE" => LocalAuthority.SCOTLAND__SOUTH_LANARKSHIRE
+              case "SCOTLAND__STIRLING" => LocalAuthority.SCOTLAND__STIRLING
+              case "SCOTLAND__WEST_DUMBARTONSHIRE" => LocalAuthority.SCOTLAND__WEST_DUMBARTONSHIRE
+              case "SCOTLAND__WEST_LOTHIAN" => LocalAuthority.SCOTLAND__WEST_LOTHIAN
+
               case other: String => throwRuntimeError(s"LocalAuthority '$other' not recognised")
             }
 
