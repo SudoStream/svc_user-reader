@@ -16,7 +16,7 @@ trait Health {
   val health: Route = path("health") {
     get {
       complete(HttpEntity(ContentTypes.`text/html(UTF-8)`,
-        "<h1>Don't worry, she'll hold together... You hear me, baby? Hold together! 0.0.1-12</h1>\n"))
+        "<h1>Don't worry, she'll hold together... You hear me, baby? Hold together! 0.0.1-14</h1>\n"))
     }
   }
 
