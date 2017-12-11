@@ -34,6 +34,16 @@ sealed class MongoDbConnectionWrapperImpl(actorSystemWrapper: ActorSystemWrapper
     case e: Exception => false
   }
 
+  private val isMinikubeRun: Boolean = try {
+    if (sys.env("MINIKUBE_RUN") == "true") {
+      System.setProperty("javax.net.ssl.keyStore", "/etc/ssl/cacerts")
+      System.setProperty("javax.net.ssl.trustStore", "/etc/ssl/cacerts")
+      true
+    } else false
+  } catch {
+    case e: Exception => false
+  }
+
   log.info(s"Running Local = $isLocalMongoDb")
 
   def getUsersCollection: MongoCollection[Document] = {
@@ -42,6 +52,7 @@ sealed class MongoDbConnectionWrapperImpl(actorSystemWrapper: ActorSystemWrapper
         buildLocalMongoDbClient
       } else {
         log.info(s"connecting to mongo db at '${mongoDbUri.getHost}:${mongoDbUri.getPort}'")
+
         System.setProperty("org.mongodb.async.type", "netty")
         MongoClient(mongoDbUriString)
       }
