@@ -1,6 +1,7 @@
 package io.sudostream.userreader.dao
 
 import io.sudostream.timetoteach.messages.systemwide.model.SocialNetwork
+import io.sudostream.userreader.dao.mongo.MongoFindQueriesProxy
 import org.mongodb.scala.Document
 import org.mongodb.scala.bson.BsonArray
 

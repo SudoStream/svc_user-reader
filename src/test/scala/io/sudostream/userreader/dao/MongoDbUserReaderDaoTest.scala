@@ -2,6 +2,7 @@ package io.sudostream.userreader.dao
 
 import io.sudostream.timetoteach.messages.systemwide.model.User
 import io.sudostream.userreader.config.{ActorSystemWrapper, ConfigHelper}
+import io.sudostream.userreader.dao.mongo.MongoDbUserReaderDao
 import org.mongodb.scala.bson.{BsonArray, BsonDocument, BsonString}
 import org.scalatest.AsyncFlatSpec
 import org.scalatest.mockito.MockitoSugar

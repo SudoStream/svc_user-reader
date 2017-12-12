@@ -8,6 +8,7 @@ import io.sudostream.userreader.api.http.HttpRoutes
 import io.sudostream.userreader.api.kafka.StreamingComponents
 import io.sudostream.userreader.config.{ActorSystemWrapper, ConfigHelper}
 import io.sudostream.userreader.dao._
+import io.sudostream.userreader.dao.mongo._
 
 // running in IDE
 // -Djavax.net.ssl.keyStore=/etc/ssl/cacerts
