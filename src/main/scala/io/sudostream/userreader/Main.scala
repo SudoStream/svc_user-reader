@@ -13,10 +13,7 @@ import io.sudostream.userreader.dao._
 // -Djavax.net.ssl.keyStore=/etc/ssl/cacerts
 // -Djavax.net.ssl.trustStore=/etc/ssl/cacerts
 // LOCAL_MONGO_DB=true
-
-object Main extends App {
-//  System.setProperty("javax.net.ssl.keyStore", "/etc/ssl/cacerts")
-//  System.setProperty("javax.net.ssl.trustStore", "/etc/ssl/cacerts")
+object Main extends App with MiniKubeHelper {
 
   lazy val configHelper: ConfigHelper = wire[ConfigHelper]
   lazy val streamingComponents = wire[StreamingComponents]

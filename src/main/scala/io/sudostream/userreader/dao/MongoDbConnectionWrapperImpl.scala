@@ -8,6 +8,7 @@ import akka.event.LoggingAdapter
 import akka.stream.Materializer
 import com.mongodb.connection.ClusterSettings
 import com.typesafe.config.ConfigFactory
+import io.sudostream.userreader.Main
 import io.sudostream.userreader.config.ActorSystemWrapper
 import org.mongodb.scala.connection.{NettyStreamFactoryFactory, SslSettings}
 import org.mongodb.scala.{Document, MongoClient, MongoClientSettings, MongoCollection, MongoDatabase, ServerAddress}
@@ -34,21 +35,11 @@ sealed class MongoDbConnectionWrapperImpl(actorSystemWrapper: ActorSystemWrapper
     case e: Exception => false
   }
 
-  private val isMinikubeRun: Boolean = try {
-    if (sys.env("MINIKUBE_RUN") == "true") {
-      System.setProperty("javax.net.ssl.keyStore", "/etc/ssl/cacerts")
-      System.setProperty("javax.net.ssl.trustStore", "/etc/ssl/cacerts")
-      true
-    } else false
-  } catch {
-    case e: Exception => false
-  }
-
   log.info(s"Running Local = $isLocalMongoDb")
 
   def getUsersCollection: MongoCollection[Document] = {
     def createMongoClient: MongoClient = {
-      if (isLocalMongoDb) {
+      if (isLocalMongoDb || Main.isMinikubeRun) {
         buildLocalMongoDbClient
       } else {
         log.info(s"connecting to mongo db at '${mongoDbUri.getHost}:${mongoDbUri.getPort}'")
