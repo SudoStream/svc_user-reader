@@ -201,6 +201,7 @@ sealed class MongoDbUserReaderDao(mongoFindQueriesProxy: MongoFindQueriesProxy,
     }
   }
 
+
   private[dao] def extractSocialNetworkIds(maybeSocialNetworkIds: Option[BsonArray]): List[SocialNetworkIdWrapper] = {
     maybeSocialNetworkIds match {
       case Some(socialNetworkIdsAsBsonArray) =>
