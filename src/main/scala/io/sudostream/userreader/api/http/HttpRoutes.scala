@@ -70,12 +70,18 @@ class HttpRoutes(dao: UserReaderDao,
                 elem =>
                   log.info(s"Received ${elem.size} user(s) from the DAO")
 
+                  val userLookupInfo = if (timeToTeachUserIdOption.isDefined) {
+                    s"timeToTeachUserId: ${timeToTeachUserIdOption.getOrElse("NONE")}"
+                  } else {
+                    s"socialNetworkName: ${socialNetworkNameOption.getOrElse("NONE")}, socialNetworkUserId: ${socialNetworkUserIdOption.getOrElse("NONE")}"
+                  }
+
                   SystemEvent(
                     eventType = SystemEventType.SPECIFIC_USER_REQUESTED,
                     requestFingerprint = UUID.randomUUID().toString,
                     requestingSystem = TimeToTeachApplication.HTTP,
                     requestingSystemExtraInfo = Option.empty,
-                    requestingUsername = Option.empty,
+                    requestingUsername = Some(userLookupInfo),
                     originalUTCTimeOfRequest = initialRequestReceived,
                     processedUTCTime = Instant.now().toEpochMilli,
                     extraInfo = Option.empty
