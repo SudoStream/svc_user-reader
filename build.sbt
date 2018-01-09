@@ -9,7 +9,7 @@ enablePlugins(DockerPlugin)
 name := "user-reader"
 organization := "io.sudostream"
 scalaVersion := "2.11.8"
-version := "0.0.1-22"
+version := "0.0.1-23"
 
 dockerBaseImage := "anapsix/alpine-java:8_server-jre"
 dockerRepository := Some("eu.gcr.io/time-to-teach-zone")

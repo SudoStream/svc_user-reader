@@ -11,6 +11,8 @@ import scala.concurrent.Future
 
 class MongoDbUserReaderDaoTest extends AsyncFlatSpec with MockitoSugar {
 
+  System.setProperty("KAFKA_SASL_JASS_USERNAME", "user123")
+  System.setProperty("KAFKA_SASL_JASS_PASSWORD", "pass123")
   private val configHelper = new ConfigHelper
   private val actorSystemWrapper = new ActorSystemWrapper(configHelper)
   private val mongoFindQueries = new MongoFindQueriesProxyStub
