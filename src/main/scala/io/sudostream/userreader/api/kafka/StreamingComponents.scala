@@ -23,6 +23,8 @@ class StreamingComponents(configHelper: ConfigHelper, actorSystemWrapper: ActorS
   lazy val kafkaProducerSaslJaasConfig = s"org.apache.kafka.common.security.scram.ScramLoginModule required " +
     s"""username="$kafkaProducerSaslJaasUsername" password="$kafkaProducerSaslJaasPassword";"""
 
+  log.debug(s"kafkaProducerSaslJaasConfig = '$kafkaProducerSaslJaasConfig'")
+
   val producerSettings = ProducerSettings(system, new ByteArraySerializer, new SystemEventSerializer)
     .withBootstrapServers(kafkaProducerBootServers)
     .withProperty(SaslConfigs.SASL_JAAS_CONFIG, kafkaProducerSaslJaasConfig)
