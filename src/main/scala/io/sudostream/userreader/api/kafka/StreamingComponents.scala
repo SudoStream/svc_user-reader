@@ -29,7 +29,7 @@ class StreamingComponents(configHelper: ConfigHelper, actorSystemWrapper: ActorS
     .withProperty(SaslConfigs.SASL_MECHANISM, "SCRAM-SHA-256")
     .withProperty(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, "SASL_SSL")
 
-  log.info(s"Sink topic is '$definedSystemEventsTopic'")
+  log.info(s"Systems event topic is '$definedSystemEventsTopic'")
 
   def definedSystemEventsTopic: String = {
     configHelper.config.getString("users-service.system_events_topic")
