@@ -32,7 +32,7 @@ class StreamingComponents(configHelper: ConfigHelper, actorSystemWrapper: ActorS
   definedSystemEventsTopic
 
   def definedSystemEventsTopic: String = {
-    val sink_topic = configHelper.config.getString("user-reader.system_events_topic")
+    val sink_topic = configHelper.config.getString("users-service.system_events_topic")
     log.info(s"Sink topic is '$sink_topic'")
     sink_topic
   }
