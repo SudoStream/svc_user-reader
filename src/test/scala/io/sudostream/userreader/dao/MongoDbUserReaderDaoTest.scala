@@ -81,21 +81,6 @@ class MongoDbUserReaderDaoTest extends AsyncFlatSpec with MockitoSugar {
   }
 
 
-  "Extract UserPreferences when has school times created" should "return User Preferences with a single school with 1 class instance " in {
-    val userReaderDao: MongoDbUserReaderDao = new MongoDbUserReaderDao(mongoFindQueries, actorSystemWrapper)
-    val maybeUserPrefs = userReaderDao.extractUserPreferences(createValidUserPreferencesBsonDocument())
-    val userPreferences = maybeUserPrefs.get
-    assert(userPreferences.allSchoolTimes.head.userTeachesTheseClasses.size === 1)
-  }
-
-  "Extract UserPreferences when has school times created" should "return User Preferences with a single school " +
-    "with 1 class instance which has 2 curriculum levels " in {
-    val userReaderDao: MongoDbUserReaderDao = new MongoDbUserReaderDao(mongoFindQueries, actorSystemWrapper)
-    val maybeUserPrefs = userReaderDao.extractUserPreferences(createValidUserPreferencesBsonDocument())
-    val userPreferences = maybeUserPrefs.get
-    assert(userPreferences.allSchoolTimes.head.userTeachesTheseClasses.head.curriculumLevels.size === 2)
-  }
-
   //////////////  Test Helper functions /////////////////
   private def createNoBsonDocument(): Option[BsonDocument] = None
   private def createEmptyBsonDocument(): Option[BsonDocument] = Some(BsonDocument())

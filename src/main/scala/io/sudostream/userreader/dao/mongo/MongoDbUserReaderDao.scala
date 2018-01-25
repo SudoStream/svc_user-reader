@@ -123,52 +123,6 @@ sealed class MongoDbUserReaderDao(mongoFindQueriesProxy: MongoFindQueriesProxy,
     createUserFromDocuments(userWithSocialIdsFutureDocuments)
   }
 
-  def extractCurriculumLevels(curriculumLevelsAsBsonArray: BsonArray): List[CurriculumLevelWrapper] = {
-    {
-      for {
-        curriculumLevelWrapperAsBsonValue <- curriculumLevelsAsBsonArray
-        curriculumLevelWrapperAsBsonDoc = curriculumLevelWrapperAsBsonValue.asInstanceOf[BsonDocument]
-        curriculumLevelAsBsonDoc = curriculumLevelWrapperAsBsonDoc.getDocument("curriculumLevel")
-        country = curriculumLevelAsBsonDoc.getString("country").getValue match {
-          case "EIRE" => Country.EIRE
-          case "ENGLAND" => Country.ENGLAND
-          case "NORTHERN_IRELAND" => Country.NORTHERN_IRELAND
-          case "SCOTLAND" => Country.SCOTLAND
-          case "WALES" => Country.WALES
-          case other: String => Country.UNKNOWN
-        }
-        scottishCurriculumLevel = curriculumLevelAsBsonDoc.getString("scottishCurriculumLevel").getValue match {
-          case "EARLY" => Some(ScottishCurriculumLevel.EARLY)
-          case "FIRST" => Some(ScottishCurriculumLevel.FIRST)
-          case "SECOND" => Some(ScottishCurriculumLevel.SECOND)
-          case "THIRD" => Some(ScottishCurriculumLevel.THIRD)
-          case "FOURTH" => Some(ScottishCurriculumLevel.FOURTH)
-          case _ => None
-        }
-      } yield CurriculumLevelWrapper(
-        curriculumLevel = CurriculumLevel(
-          country = country,
-          scottishCurriculumLevel = scottishCurriculumLevel
-        )
-      )
-    }.toList
-  }
-
-  def extractSchoolClassesForSchool(schoolTimesAsBsonDoc: BsonDocument): List[SchoolClass] = {
-    val schoolClassesAsBsonArray = schoolTimesAsBsonDoc.getArray("userTeachesTheseClasses")
-
-    val schoolClasses = for {
-      taughtClassAsBsonValue <- schoolClassesAsBsonArray
-      taughtClassAsBsonDoc = taughtClassAsBsonValue.asInstanceOf[BsonDocument]
-      className: String = taughtClassAsBsonDoc.getString("className").getValue
-      curriculumLevels: List[CurriculumLevelWrapper] = extractCurriculumLevels(taughtClassAsBsonDoc.getArray("curriculumLevels"))
-    } yield SchoolClass(
-      className = className,
-      curriculumLevels = curriculumLevels)
-
-    schoolClasses.toList
-  }
-
   private[dao] def extractUserPreferences(maybeUserPreferences: Option[BsonDocument]): Option[UserPreferences] = {
     maybeUserPreferences match {
       case Some(userPrefs) =>
@@ -180,7 +134,6 @@ sealed class MongoDbUserReaderDao(mongoFindQueriesProxy: MongoFindQueriesProxy,
             for {
               schoolTimesBsonValue <- allSchoolTimesMongoArray
               schoolTimesAsBsonDoc = schoolTimesBsonValue.asInstanceOf[BsonDocument]
-              allClassesForSchool: List[SchoolClass] = extractSchoolClassesForSchool(schoolTimesAsBsonDoc)
 
               schoolTimes = SchoolTimes(
                 schoolId = schoolTimesAsBsonDoc.getString("schoolId").getValue,
@@ -189,8 +142,7 @@ sealed class MongoDbUserReaderDao(mongoFindQueriesProxy: MongoFindQueriesProxy,
                 morningBreakEndTime = schoolTimesAsBsonDoc.getString("morningBreakEndTime").getValue,
                 lunchStartTime = schoolTimesAsBsonDoc.getString("lunchStartTime").getValue,
                 lunchEndTime = schoolTimesAsBsonDoc.getString("lunchEndTime").getValue,
-                schoolEndTime = schoolTimesAsBsonDoc.getString("schoolEndTime").getValue,
-                userTeachesTheseClasses = allClassesForSchool
+                schoolEndTime = schoolTimesAsBsonDoc.getString("schoolEndTime").getValue
               )
             } yield schoolTimes
           }.toList
