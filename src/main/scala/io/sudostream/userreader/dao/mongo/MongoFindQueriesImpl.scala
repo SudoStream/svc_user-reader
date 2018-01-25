@@ -10,6 +10,8 @@ class MongoFindQueriesImpl(mongoDbConnectionWrapper: MongoDbConnectionWrapper) e
 
   val usersCollection: MongoCollection[Document] = mongoDbConnectionWrapper.getUsersCollection
 
+  mongoDbConnectionWrapper.ensureIndexes()
+
   override def findAllUsers: Future[Seq[Document]] = {
     val usersMongoDocuments: FindObservable[Document] = usersCollection.find(Document())
     usersMongoDocuments.toFuture()

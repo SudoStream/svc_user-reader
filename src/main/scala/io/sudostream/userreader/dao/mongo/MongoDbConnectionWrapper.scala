@@ -6,4 +6,6 @@ trait MongoDbConnectionWrapper {
 
   def getUsersCollection: MongoCollection[Document]
 
+  def ensureIndexes()
+
 }

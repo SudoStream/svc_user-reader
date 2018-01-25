@@ -10,11 +10,13 @@ import com.mongodb.connection.ClusterSettings
 import com.typesafe.config.ConfigFactory
 import io.sudostream.userreader.Main
 import io.sudostream.userreader.config.ActorSystemWrapper
+import org.mongodb.scala.bson.BsonDocument
 import org.mongodb.scala.connection.{NettyStreamFactoryFactory, SslSettings}
 import org.mongodb.scala.{Document, MongoClient, MongoClientSettings, MongoCollection, MongoDatabase, ServerAddress}
 
 import scala.collection.JavaConverters._
 import scala.concurrent.ExecutionContextExecutor
+import scala.util.{Failure, Success}
 
 sealed class MongoDbConnectionWrapperImpl(actorSystemWrapper: ActorSystemWrapper) extends MongoDbConnectionWrapper {
 
@@ -79,6 +81,16 @@ sealed class MongoDbConnectionWrapperImpl(actorSystemWrapper: ActorSystemWrapper
       .build()
 
     MongoClient(mongoSslClientSettings)
+  }
+
+  override def ensureIndexes(): Unit = {
+    val socialNetworksIndex = BsonDocument("socialNetworkIds" -> 1)
+    log.info(s"Ensuring index created : ${socialNetworksIndex.toString}")
+    val obs = getUsersCollection.createIndex(socialNetworksIndex)
+    obs.toFuture().onComplete {
+      case Success(msg) => log.info(s"Ensure index attempt completed with msg : $msg")
+      case Failure(ex) => log.info(s"Ensure index failed to complete: ${ex.getMessage}")
+    }
   }
 
 }
