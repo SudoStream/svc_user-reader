@@ -9,7 +9,7 @@ enablePlugins(DockerPlugin)
 name := "user-reader"
 organization := "io.sudostream"
 scalaVersion := "2.11.8"
-version := "0.0.1-34"
+version := "0.0.1-35"
 
 dockerBaseImage := "anapsix/alpine-java:8_server-jre"
 dockerRepository := Some("eu.gcr.io/time-to-teach-zone")
@@ -30,7 +30,7 @@ libraryDependencies ++= {
   val akkaV = "2.5.4"
   val akkaHttpVersion = "10.0.10"
   Seq(
-    "io.sudostream.timetoteach" %% "messages" % "0.0.11-46",
+    "io.sudostream.timetoteach" %% "messages" % "0.0.11-50",
 
     "com.typesafe.akka" %% "akka-actor" % akkaV,
     "com.typesafe.akka" %% "akka-stream" % akkaV,
